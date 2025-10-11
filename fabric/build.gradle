@@ -6,6 +6,14 @@ plugins {
 
 group = "ru.l0sty.dreamdisplays"
 
+configurations.all {
+	resolutionStrategy {
+		// Force latest JNA versions to fix security vulnerabilities
+		force 'net.java.dev.jna:jna:5.16.0'
+		force 'net.java.dev.jna:jna-platform:5.16.0'
+	}
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
