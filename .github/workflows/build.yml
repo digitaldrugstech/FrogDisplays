@@ -1,4 +1,3 @@
-
 # Automatically build the project and run any configured tests for every push
 # and submitted pull request. This can help catch issues that only occur on
 # certain platforms or Java versions, and provides a first line of defence
@@ -15,30 +14,54 @@ jobs:
         java: [
           21,    # Current Java LTS
         ]
-    runs-on: ubuntu-24.04
+        # Test on multiple operating systems
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
+
       - name: setup jdk ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
+          cache: 'gradle'
+
       - name: make gradle wrapper executable
+        if: runner.os != 'Windows'
         run: chmod +x ./gradlew
+
       - name: build
-        run: ./gradlew build
-      - name: Capture client jar
-        if: ${{ matrix.java == '21' }}
+        run: ./gradlew build --no-daemon --stacktrace
+
+      - name: run tests
+        run: ./gradlew test --no-daemon --stacktrace
+        continue-on-error: true
+
+      - name: upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-java${{ matrix.java }}
+          path: |
+            **/build/test-results/test/
+            **/build/reports/tests/test/
+        continue-on-error: true
+
+      - name: capture client jar
+        if: ${{ matrix.os == 'ubuntu-24.04' && matrix.java == '21' }}
         uses: actions/upload-artifact@v4
         with:
           name: displays-client
           path: build/libs/*client*.jar
-      - name: Capture server jar
-        if: ${{ matrix.java == '21' }}
+
+      - name: capture server jar
+        if: ${{ matrix.os == 'ubuntu-24.04' && matrix.java == '21' }}
         uses: actions/upload-artifact@v4
         with:
-          name: displays server
+          name: displays-server
           path: build/libs/*server*.jar
