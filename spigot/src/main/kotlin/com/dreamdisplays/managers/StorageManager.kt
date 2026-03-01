@@ -164,7 +164,12 @@ class StorageManager(var plugin: Main) {
                         val id = bytesToUuid(rs.getBytes("id"))
                         val ownerId = bytesToUuid(rs.getBytes("ownerId"))
                         val videoCode = rs.getString("videoCode")
-                        val world = Bukkit.getWorld(rs.getString("world"))
+                        val worldName = rs.getString("world")
+                        val world = Bukkit.getWorld(worldName)
+                        if (world == null) {
+                            plugin.logger.warning("Skipping display $id: world '$worldName' is not loaded")
+                            continue
+                        }
 
                         val packed1 = rs.getLong("pos1")
                         val packed2 = rs.getLong("pos2")
@@ -227,7 +232,8 @@ class StorageManager(var plugin: Main) {
         }
 
         private fun unpackX(packed: Long): Int {
-            return (packed shr 38).toInt()
+            val raw = (packed shr 38).toInt()
+            return if (raw and (1 shl 25) != 0) raw or (-1 shl 26) else raw
         }
 
         private fun unpackY(packed: Long): Int {

@@ -132,5 +132,6 @@
   "displayInfoUnknownWorld": "Неизвестно",
   "displayInfoUnknownDuration": "неизвестно",
   "displayInfoAutoLang": "авто",
-  "displayInfoUnavailableUrl": "Н/Д"
+  "displayInfoUnavailableUrl": "Н/Д",
+  "displayLimitReached": "&7D |&f Вы достигли максимального количества дисплеев!"
 }
