@@ -14,7 +14,7 @@ import java.util.*
  */
 @NullMarked
 object StateManager {
-    private val playStates: MutableMap<UUID, StateData> = HashMap()
+    private val playStates: MutableMap<UUID, StateData> = java.util.concurrent.ConcurrentHashMap()
 
     @JvmStatic
     fun processSyncPacket(packet: SyncData, player: Player) {

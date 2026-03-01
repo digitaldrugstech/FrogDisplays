@@ -12,7 +12,7 @@ import java.util.*
  * Manages player selections for display creation.
  */
 object SelectionManager {
-    val selectionPoints = mutableMapOf<UUID, SelectionData>()
+    val selectionPoints: MutableMap<UUID, SelectionData> = java.util.concurrent.ConcurrentHashMap()
 
     fun setFirstPoint(player: Player, loc: Location, face: Any) {
         val sel = selectionPoints.getOrPut(player.uniqueId) { SelectionData(player) }

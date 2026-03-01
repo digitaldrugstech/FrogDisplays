@@ -243,7 +243,9 @@ class ListCommand : SubCommand {
     }
 
     private fun getOwnerName(ownerId: UUID, ownerNameCache: MutableMap<UUID, String?>): String? {
-        return ownerNameCache.getOrPut(ownerId) { Bukkit.getOfflinePlayer(ownerId).name }
+        return ownerNameCache.getOrPut(ownerId) {
+            Bukkit.getPlayer(ownerId)?.name
+        }
     }
 
     private fun sortedDisplays(): List<DisplayData> {

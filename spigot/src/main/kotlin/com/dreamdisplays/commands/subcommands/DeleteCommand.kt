@@ -25,6 +25,11 @@ class DeleteCommand : SubCommand {
         val data = isContains(block.location)
             ?: return sendMessage(player, "noDisplay")
 
+        if (data.ownerId != player.uniqueId && !player.hasPermission(config.permissions.delete)) {
+            sendMessage(player, "displayCommandMissingPermission")
+            return
+        }
+
         delete(data)
         sendMessage(player, "displayDeleted")
     }
