@@ -132,5 +132,6 @@
   "displayInfoUnknownWorld": "Unknown",
   "displayInfoUnknownDuration": "unknown",
   "displayInfoAutoLang": "auto",
-  "displayInfoUnavailableUrl": "N/A"
+  "displayInfoUnavailableUrl": "N/A",
+  "displayLimitReached": "&7D |&f You have reached the maximum number of displays!"
 }

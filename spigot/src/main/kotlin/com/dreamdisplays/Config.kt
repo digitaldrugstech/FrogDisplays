@@ -150,6 +150,7 @@ class Config(private val plugin: Main) {
         val maxWidth get() = display.max_width
         val maxHeight get() = display.max_height
         val maxRenderDistance get() = display.max_render_distance
+        val maxDisplaysPerPlayer get() = display.max_displays_per_player
 
         internal fun initMaterials() {
             selectionMaterial = Material.matchMaterial(display.selection_material) ?: Material.DIAMOND_AXE
@@ -179,6 +180,7 @@ class Config(private val plugin: Main) {
             val max_width: Int = 32,
             val max_height: Int = 24,
             val max_render_distance: Double = 96.0,
+            val max_displays_per_player: Int = 10,
         )
     }
 

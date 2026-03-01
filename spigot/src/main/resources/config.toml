@@ -10,6 +10,9 @@ default_language = "en"
 selection_material = "DIAMOND_AXE"
 base_material = "BLACK_CONCRETE"
 
+# Maximum number of displays per player (0 = unlimited)
+max_displays_per_player = 10
+
 # Display size limits
 # All values are in blocks
 max_render_distance = 96.0

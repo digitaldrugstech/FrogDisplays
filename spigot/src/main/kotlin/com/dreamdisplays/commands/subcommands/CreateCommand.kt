@@ -33,6 +33,15 @@ class CreateCommand : SubCommand {
             return
         }
 
+        val maxPerPlayer = config.settings.maxDisplaysPerPlayer
+        if (maxPerPlayer > 0) {
+            val playerCount = DisplayManager.getDisplays().count { it.ownerId == player.uniqueId }
+            if (playerCount >= maxPerPlayer) {
+                sendMessage(player, "displayLimitReached")
+                return
+            }
+        }
+
         val displayData = sel.generateDisplayData()
         selectionPoints.remove(player.uniqueId)
 
