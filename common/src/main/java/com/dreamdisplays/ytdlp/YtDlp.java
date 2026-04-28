@@ -119,7 +119,8 @@ public final class YtDlp {
                 binary,
                 "-J",
                 "--no-playlist",
-                "--no-warnings"
+                "--no-warnings",
+                "--no-config"
         ));
         String browser = detectCookieBrowser();
         if (browser != null) {

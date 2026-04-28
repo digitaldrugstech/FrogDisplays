@@ -510,13 +510,22 @@ public class MediaPlayer {
             LoggingManager.error("Failed to initialize MediaPlayer ", e);
             screen.errored = true;
             String msg = e.getMessage();
-            if (msg != null && (msg.contains("Sign in to confirm") || msg.contains("bot"))) {
+            if (msg != null) {
+                String chatMsg;
+                if (msg.contains("Sign in to confirm") || msg.contains("bot")) {
+                    chatMsg = "§7D |§c Не удалось загрузить видео: YouTube требует авторизацию.\n"
+                            + "§7D |§f Закройте браузер и перезайдите на сервер, или установите §eyt-dlp§f и выполните:\n"
+                            + "§7D |§e yt-dlp --cookies-from-browser chrome";
+                } else if (msg.contains("not executable")) {
+                    chatMsg = "§7D |§c Не удалось запустить yt-dlp.\n"
+                            + "§7D |§f Установите через: §ebrew install yt-dlp§f (macOS) или §ewinget install yt-dlp§f (Windows)";
+                } else {
+                    chatMsg = "§7D |§c Не удалось загрузить видео: " + msg.substring(0, Math.min(msg.length(), 100));
+                }
                 Minecraft.getInstance().execute(() -> {
                     if (Minecraft.getInstance().player != null) {
                         Minecraft.getInstance().player.displayClientMessage(
-                                net.minecraft.network.chat.Component.literal(
-                                        "§cD |§f YouTube requires sign-in. Install yt-dlp and run: §eyt-dlp --cookies-from-browser chrome"
-                                ), false
+                                net.minecraft.network.chat.Component.literal(chatMsg), false
                         );
                     }
                 });
