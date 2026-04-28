@@ -421,7 +421,7 @@ public final class YtDlp {
             }
             if (os.contains("mac")) {
                 try {
-                    new ProcessBuilder("xattr", "-d", "com.apple.quarantine", target.toString())
+                    new ProcessBuilder("xattr", "-cr", target.toString())
                             .redirectErrorStream(true)
                             .start()
                             .waitFor(5, TimeUnit.SECONDS);
