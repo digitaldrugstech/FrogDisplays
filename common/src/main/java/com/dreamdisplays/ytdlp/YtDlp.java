@@ -115,13 +115,19 @@ public final class YtDlp {
 
     private static List<YtStream> fetchUncached(String videoUrl) throws IOException {
         String binary = resolveBinary();
-        ProcessBuilder pb = new ProcessBuilder(
+        List<String> command = new ArrayList<>(List.of(
                 binary,
                 "-J",
                 "--no-playlist",
-                "--no-warnings",
-                videoUrl
-        );
+                "--no-warnings"
+        ));
+        String browser = detectCookieBrowser();
+        if (browser != null) {
+            command.add("--cookies-from-browser");
+            command.add(browser);
+        }
+        command.add(videoUrl);
+        ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(false);
         Process process = pb.start();
 
@@ -436,6 +442,27 @@ public final class YtDlp {
         }
         LoggingManager.info("yt-dlp ready at " + path);
         return path;
+    }
+
+    private static @Nullable String detectCookieBrowser() {
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH);
+        if (os.contains("mac")) {
+            if (new File("/Applications/Google Chrome.app").exists()) return "chrome";
+            if (new File("/Applications/Firefox.app").exists()) return "firefox";
+            if (new File("/Applications/Brave Browser.app").exists()) return "brave";
+        } else if (os.contains("win")) {
+            String localAppData = System.getenv("LOCALAPPDATA");
+            if (localAppData != null) {
+                if (new File(localAppData, "Google/Chrome/User Data").isDirectory()) return "chrome";
+                if (new File(localAppData, "BraveSoftware/Brave-Browser/User Data").isDirectory()) return "brave";
+            }
+            String appData = System.getenv("APPDATA");
+            if (appData != null && new File(appData, "Mozilla/Firefox/Profiles").isDirectory()) return "firefox";
+        } else {
+            if (new File(System.getProperty("user.home", ""), ".config/google-chrome").isDirectory()) return "chrome";
+            if (new File(System.getProperty("user.home", ""), ".mozilla/firefox").isDirectory()) return "firefox";
+        }
+        return null;
     }
 
     private static boolean canExecute(String path) {
