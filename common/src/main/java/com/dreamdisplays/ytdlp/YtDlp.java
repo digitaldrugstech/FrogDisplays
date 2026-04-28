@@ -407,12 +407,22 @@ public final class YtDlp {
         Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.ATOMIC_MOVE);
 
-        if (!System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).contains("win")) {
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH);
+        if (!os.contains("win")) {
             try {
                 Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
                 Files.setPosixFilePermissions(target, perms);
             } catch (UnsupportedOperationException ignored) {
                 target.toFile().setExecutable(true, false);
+            }
+            if (os.contains("mac")) {
+                try {
+                    new ProcessBuilder("xattr", "-d", "com.apple.quarantine", target.toString())
+                            .redirectErrorStream(true)
+                            .start()
+                            .waitFor(5, TimeUnit.SECONDS);
+                } catch (Exception ignored) {
+                }
             }
         }
 
