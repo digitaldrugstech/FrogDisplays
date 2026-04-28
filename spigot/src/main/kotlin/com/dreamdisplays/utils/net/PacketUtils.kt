@@ -29,6 +29,7 @@ object PacketUtils {
     private const val CHANNEL_DISPLAY_ENABLED = "dreamdisplays:display_enabled"
     private const val CHANNEL_REPORT_ENABLED = "dreamdisplays:report_enabled"
     private const val CHANNEL_CLEAR_CACHE = "dreamdisplays:clear_cache"
+    private const val CHANNEL_STREAMS = "dreamdisplays:streams"
 
     private val plugin: Main by lazy { Main.getInstance() }
 
@@ -105,6 +106,18 @@ object PacketUtils {
 
     fun sendReportEnabled(player: Player, isEnabled: Boolean) {
         sendBooleanPacket(player, CHANNEL_REPORT_ENABLED, isEnabled)
+    }
+
+    fun sendStreams(players: List<Player?>, videoUrl: String, jsonStreams: String) {
+        runCatching {
+            val packet = buildPacket { output ->
+                output.writeString(videoUrl)
+                output.writeString(jsonStreams)
+            }
+            sendPacket(players, CHANNEL_STREAMS, packet)
+        }.onFailure { error ->
+            warn("Failed to send streams packet", error)
+        }
     }
 
     fun sendClearCache(players: List<Player?>, displayUuids: List<UUID>) {

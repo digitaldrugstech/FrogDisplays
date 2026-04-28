@@ -236,4 +236,35 @@ public final class Packets {
             return PACKET_ID;
         }
     }
+
+    public record Streams(String videoUrl, String streamsJson) implements CustomPacketPayload {
+        public static final Type<Streams> PACKET_ID = createType("streams");
+        public static final StreamCodec<FriendlyByteBuf, Streams> PACKET_CODEC =
+                StreamCodec.of(
+                        (buf, packet) -> {
+                            buf.writeUtf(packet.videoUrl);
+                            buf.writeUtf(packet.streamsJson);
+                        },
+                        buf -> new Streams(buf.readUtf(), buf.readUtf())
+                );
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
+    }
+
+    public record RequestStreams(String videoUrl) implements CustomPacketPayload {
+        public static final Type<RequestStreams> PACKET_ID = createType("request_streams");
+        public static final StreamCodec<FriendlyByteBuf, RequestStreams> PACKET_CODEC =
+                StreamCodec.of(
+                        (buf, packet) -> buf.writeUtf(packet.videoUrl),
+                        buf -> new RequestStreams(buf.readUtf())
+                );
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
+    }
 }

@@ -422,7 +422,25 @@ public class MediaPlayer {
             // Build proper YouTube URL with just the video ID
             String cleanUrl = "https://www.youtube.com/watch?v=" + videoId;
 
-            java.util.List<YtStream> all = YtDlp.fetch(cleanUrl);
+            // Try server-resolved streams first
+            java.util.List<YtStream> all = Initializer.getCachedStreams(cleanUrl);
+
+            if (all == null || all.isEmpty()) {
+                Initializer.requestStreamResolution(cleanUrl);
+                // Wait up to 10 seconds for server response
+                for (int i = 0; i < 100 && !terminated.get(); i++) {
+                    Thread.sleep(100);
+                    all = Initializer.getCachedStreams(cleanUrl);
+                    if (all != null && !all.isEmpty()) break;
+                }
+            }
+
+            // Fallback to local yt-dlp
+            if (all == null || all.isEmpty()) {
+                LoggingManager.info("Server streams not available, falling back to local yt-dlp");
+                all = YtDlp.fetch(cleanUrl);
+            }
+
             if (terminated.get()) return;
             if (all.isEmpty()) {
                 LoggingManager.error("No streams available");

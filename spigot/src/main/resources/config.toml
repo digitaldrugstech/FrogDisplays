@@ -65,3 +65,18 @@ delete = "dreamdisplays.delete"      # Default: op
 reload = "dreamdisplays.reload"      # Default: op
 updates = "dreamdisplays.updates"    # Default: op
 toggle_others = "dreamdisplays.toggle.others" # Default: op
+
+[youtube]
+# Server-side YouTube stream resolution via yt-dlp.
+# Resolves stream URLs on the server so clients don't need yt-dlp.
+
+# Path to yt-dlp binary. Leave empty to auto-detect or auto-download.
+ytdlp_path = ""
+
+# Path to a Netscape-format cookies file for YouTube authentication.
+# Helps bypass bot detection. Leave empty to try without cookies.
+cookies_file = ""
+
+# How long to cache resolved stream URLs, in seconds.
+# YouTube stream URLs expire after ~6 hours, so the default of 5 hours is safe.
+cache_ttl = 18000

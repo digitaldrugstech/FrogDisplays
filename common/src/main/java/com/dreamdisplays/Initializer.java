@@ -10,6 +10,7 @@ import com.dreamdisplays.util.Facing;
 import com.dreamdisplays.util.RayCasting;
 import com.dreamdisplays.util.Utils;
 import com.dreamdisplays.ytdlp.YtDlp;
+import com.dreamdisplays.ytdlp.YtStream;
 import me.inotsleep.utils.logging.LoggingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,8 +27,10 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -38,6 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Initializer {
 
     public static final String MOD_ID = "dreamdisplays";
+    private static final ConcurrentHashMap<String, List<YtStream>> serverStreamCache = new ConcurrentHashMap<>();
     private static final boolean[] wasPressed = {false};
     private static final AtomicBoolean wasInMultiplayer = new AtomicBoolean(
             false
@@ -365,6 +369,26 @@ public class Initializer {
     private static void checkAndOpenScreen() {
         if (hoveredScreen == null) return;
         Configuration.open(hoveredScreen);
+    }
+
+    public static void onStreamsPacket(Streams packet) {
+        try {
+            // Server sends raw yt-dlp JSON — reuse existing parser
+            List<YtStream> streams = YtDlp.parseFormatsFromJson(packet.streamsJson());
+            if (!streams.isEmpty()) {
+                serverStreamCache.put(packet.videoUrl(), streams);
+            }
+        } catch (Exception e) {
+            LoggingManager.error("Failed to parse streams packet for " + packet.videoUrl(), e);
+        }
+    }
+
+    public static @Nullable List<YtStream> getCachedStreams(String videoUrl) {
+        return serverStreamCache.get(videoUrl);
+    }
+
+    public static void requestStreamResolution(String videoUrl) {
+        sendPacket(new RequestStreams(videoUrl));
     }
 
     public static void sendPacket(CustomPacketPayload packet) {

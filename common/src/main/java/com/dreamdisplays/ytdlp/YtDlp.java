@@ -166,6 +166,10 @@ public final class YtDlp {
     private record CacheEntry(List<YtStream> streams, long createdAtMs) {
     }
 
+    public static List<YtStream> parseFormatsFromJson(String json) throws IOException {
+        return parseFormats(json);
+    }
+
     private static List<YtStream> parseFormats(String json) throws IOException {
         List<YtStream> result = new ArrayList<>();
         JsonElement root;

@@ -73,6 +73,12 @@ public class DreamDisplaysMod implements com.dreamdisplays.Mod {
                 (payload, ctx) -> Initializer.onClearCachePacket(payload)
         );
 
+        registrar.playToClient(
+                Streams.PACKET_ID,
+                Streams.PACKET_CODEC,
+                (payload, ctx) -> Initializer.onStreamsPacket(payload)
+        );
+
         registrar.playBidirectional(
                 Sync.PACKET_ID,
                 Sync.PACKET_CODEC,
@@ -96,6 +102,12 @@ public class DreamDisplaysMod implements com.dreamdisplays.Mod {
         registrar.playToServer(
                 Version.PACKET_ID,
                 Version.PACKET_CODEC,
+                (p, c) -> {
+                }
+        );
+        registrar.playToServer(
+                RequestStreams.PACKET_ID,
+                RequestStreams.PACKET_CODEC,
                 (p, c) -> {
                 }
         );

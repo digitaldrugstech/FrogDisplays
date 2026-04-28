@@ -28,6 +28,8 @@ class Config(private val plugin: Main) {
         private set
     lateinit var permissions: PermissionsSection
         private set
+    lateinit var youtube: YoutubeSection
+        private set
     val messages = mutableMapOf<String, Any>()
     val languages = mutableMapOf<String, Map<String, Any>>()
 
@@ -60,6 +62,7 @@ class Config(private val plugin: Main) {
         settings = toml.to(SettingsSection::class.java)?.apply { initMaterials() } ?: SettingsSection()
         storage = toml.to(StorageSection::class.java) ?: StorageSection()
         permissions = toml.to(PermissionsSection::class.java) ?: PermissionsSection()
+        youtube = toml.to(YoutubeSection::class.java) ?: YoutubeSection()
     }
 
     // Reload configuration
@@ -237,6 +240,20 @@ class Config(private val plugin: Main) {
             val help: String = "dreamdisplays.help",
             val stats: String = "dreamdisplays.stats",
             val toggle_others: String = "dreamdisplays.toggle.others",
+        )
+    }
+
+    data class YoutubeSection(
+        val youtube: YoutubeConfig = YoutubeConfig(),
+    ) {
+        val ytdlpPath get() = youtube.ytdlp_path
+        val cookiesFile get() = youtube.cookies_file
+        val cacheTtlMs get() = youtube.cache_ttl * 1000L
+
+        data class YoutubeConfig(
+            val ytdlp_path: String = "",
+            val cookies_file: String = "",
+            val cache_ttl: Long = 18000,
         )
     }
 

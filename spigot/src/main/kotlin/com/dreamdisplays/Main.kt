@@ -2,6 +2,7 @@ package com.dreamdisplays
 
 import com.dreamdisplays.commands.DisplayCommand
 import com.dreamdisplays.managers.StorageManager
+import com.dreamdisplays.managers.StreamResolver
 import com.dreamdisplays.registrar.ChannelRegistrar.registerChannels
 import com.dreamdisplays.registrar.ListenerRegistrar.registerListeners
 import com.dreamdisplays.registrar.SchedulerRegistrar.runRepeatingTasks
@@ -15,6 +16,7 @@ import org.jspecify.annotations.NullMarked
 @NullMarked
 class Main : JavaPlugin() {
     lateinit var storage: StorageManager
+    lateinit var streamResolver: StreamResolver
     var audiences: BukkitAudiences? = null
 
     override fun onEnable() {
@@ -44,6 +46,9 @@ class Main : JavaPlugin() {
         // Storage
         storage = StorageManager(this)
 
+        // YouTube stream resolver
+        streamResolver = StreamResolver(Companion.config.youtube)
+
         // Register commands
         val displayCommand = DisplayCommand()
         getCommand("display")?.setExecutor(displayCommand)
@@ -62,6 +67,9 @@ class Main : JavaPlugin() {
         log("Disabling Dream Displays ${description.version}...")
         audiences?.close()
         storage.onDisable()
+        if (::streamResolver.isInitialized) {
+            streamResolver.shutdown()
+        }
     }
 
     companion object {

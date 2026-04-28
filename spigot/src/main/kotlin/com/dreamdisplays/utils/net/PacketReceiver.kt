@@ -18,10 +18,13 @@ import com.dreamdisplays.managers.StateManager.processSyncPacket
 import com.dreamdisplays.managers.StateManager.sendSyncPacket
 import com.dreamdisplays.utils.Message.sendColoredMessage
 import com.dreamdisplays.utils.Message.sendMessage
+import com.dreamdisplays.utils.Scheduler
+import com.dreamdisplays.utils.YouTubeUtils
 import com.dreamdisplays.utils.YouTubeUtils.sanitize
 import com.dreamdisplays.utils.net.PacketUtils.sendDisplayInfo
 import com.dreamdisplays.utils.net.PacketUtils.sendPremium
 import com.dreamdisplays.utils.net.PacketUtils.sendReportEnabled
+import com.dreamdisplays.utils.net.PacketUtils.sendStreams
 import com.github.zafarkhaja.semver.Version
 import com.github.zafarkhaja.semver.Version.parse
 import com.google.gson.Gson
@@ -33,6 +36,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import org.jspecify.annotations.NullMarked
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 /**
@@ -52,6 +56,7 @@ class PacketReceiver(private val plugin: Main) : PluginMessageListener {
             "dreamdisplays:report" -> handleReport(player, message)
             "dreamdisplays:version" -> handleVersion(player, message)
             "dreamdisplays:display_enabled" -> handleDisplayEnabled(player, message)
+            "dreamdisplays:req_streams" -> handleRequestStreams(player, message)
         }
     }
 
@@ -121,6 +126,21 @@ class PacketReceiver(private val plugin: Main) : PluginMessageListener {
             }
         }.onFailure { error ->
             warn("Failed to decode display enabled packet", error)
+        }
+    }
+
+    private fun handleRequestStreams(player: Player, message: ByteArray) {
+        runCatching {
+            val videoUrl = DataInputStream(ByteArrayInputStream(message)).use { input ->
+                val length = input.readVarInt()
+                require(length in 1..2048) { "Invalid req_streams url length: $length" }
+                val bytes = ByteArray(length)
+                input.readFully(bytes)
+                String(bytes, StandardCharsets.UTF_8)
+            }
+            resolveAndSendStreams(listOf(player), videoUrl)
+        }.onFailure { error ->
+            warn("Failed to decode req_streams packet", error)
         }
     }
 
@@ -214,22 +234,36 @@ class PacketReceiver(private val plugin: Main) : PluginMessageListener {
     }
 
     private fun sendAllDisplays(player: Player) {
-        getDisplays()
-            .filter { it.pos1.world == player.world }
-            .forEach { display ->
-                sendDisplayInfo(
-                    listOf(player),
-                    display.id,
-                    display.ownerId,
-                    display.box.min,
-                    display.width,
-                    display.height,
-                    display.url,
-                    display.lang,
-                    display.facing,
-                    display.isSync
-                )
+        val displays = getDisplays().filter { it.pos1.world == player.world }
+        displays.forEach { display ->
+            sendDisplayInfo(
+                listOf(player),
+                display.id,
+                display.ownerId,
+                display.box.min,
+                display.width,
+                display.height,
+                display.url,
+                display.lang,
+                display.facing,
+                display.isSync
+            )
+        }
+        // Pre-resolve stream URLs for all YouTube displays in this world
+        displays.mapTo(linkedSetOf()) { it.url }
+            .filter { YouTubeUtils.extractVideoIdFromUri(it) != null }
+            .forEach { url -> resolveAndSendStreams(listOf(player), url) }
+    }
+
+    private fun resolveAndSendStreams(players: List<Player>, videoUrl: String) {
+        Scheduler.runAsync {
+            runCatching {
+                val json = plugin.streamResolver.resolve(videoUrl) ?: return@runAsync
+                sendStreams(players, videoUrl, json)
+            }.onFailure { error ->
+                warn("Failed to resolve streams for $videoUrl", error)
             }
+        }
     }
 
     private fun readUUIDPacket(message: ByteArray): UUID? {

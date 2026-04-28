@@ -14,7 +14,8 @@ object ChannelRegistrar {
         "dreamdisplays:delete",
         "dreamdisplays:report",
         "dreamdisplays:version",
-        "dreamdisplays:display_enabled"
+        "dreamdisplays:display_enabled",
+        "dreamdisplays:req_streams"
     )
 
     private val outgoingChannels = listOf(
@@ -23,7 +24,8 @@ object ChannelRegistrar {
         "dreamdisplays:sync",
         "dreamdisplays:delete",
         "dreamdisplays:report_enabled",
-        "dreamdisplays:clear_cache"
+        "dreamdisplays:clear_cache",
+        "dreamdisplays:streams"
     )
 
     fun registerChannels(plugin: Main) {
