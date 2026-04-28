@@ -42,5 +42,8 @@
   "dreamdisplays.button.delete.tooltip.2": "Навсегда удаляет этот дисплей",
   "dreamdisplays.button.report": "Жалоба",
   "dreamdisplays.button.report.tooltip.1": "Пожаловаться на дисплей",
-  "dreamdisplays.button.report.tooltip.2": "Пожаловаться на неподобающий контент"
+  "dreamdisplays.button.report.tooltip.2": "Пожаловаться на неподобающий контент",
+  "dreamdisplays.error.bot_detection": "§7D |§c Не удалось загрузить видео: YouTube требует авторизацию.\n§7D |§f Закройте браузер и перезайдите на сервер, или установите §eyt-dlp§f и выполните:\n§7D |§e yt-dlp --cookies-from-browser chrome",
+  "dreamdisplays.error.not_executable": "§7D |§c Не удалось запустить yt-dlp.\n§7D |§f Установите через: §ebrew install yt-dlp§f (macOS) или §ewinget install yt-dlp§f (Windows)",
+  "dreamdisplays.error.generic": "§7D |§c Не удалось загрузить видео: %s"
 }

@@ -42,5 +42,8 @@
   "dreamdisplays.button.delete.tooltip.2": "Permanently removes this display",
   "dreamdisplays.button.report": "Report",
   "dreamdisplays.button.report.tooltip.1": "Report display",
-  "dreamdisplays.button.report.tooltip.2": "Report inappropriate content"
+  "dreamdisplays.button.report.tooltip.2": "Report inappropriate content",
+  "dreamdisplays.error.bot_detection": "§7D |§c Failed to load video: YouTube requires authentication.\n§7D |§f Close your browser and rejoin the server, or install §eyt-dlp§f and run:\n§7D |§e yt-dlp --cookies-from-browser chrome",
+  "dreamdisplays.error.not_executable": "§7D |§c Failed to run yt-dlp.\n§7D |§f Install via: §ebrew install yt-dlp§f (macOS) or §ewinget install yt-dlp§f (Windows)",
+  "dreamdisplays.error.generic": "§7D |§c Failed to load video: %s"
 }
