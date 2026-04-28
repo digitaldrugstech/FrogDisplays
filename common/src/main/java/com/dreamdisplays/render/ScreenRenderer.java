@@ -1,11 +1,15 @@
 package com.dreamdisplays.render;
 
+import com.dreamdisplays.Initializer;
 import com.dreamdisplays.screen.Manager;
 import com.dreamdisplays.screen.Screen;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -16,6 +20,18 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class ScreenRenderer {
+
+    private static final Identifier ERROR_TEXTURE =
+            Identifier.fromNamespaceAndPath(Initializer.MOD_ID, "textures/error.png");
+    private static final RenderType ERROR_RENDER_TYPE = RenderType.create(
+            "dream-displays-error",
+            RenderSetup.builder(RenderPipelines.SOLID_BLOCK)
+                    .withTexture("Sampler0", ERROR_TEXTURE)
+                    .bufferSize(RenderType.BIG_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .useLightmap()
+                    .createRenderSetup()
+    );
 
     // Renders all screens in the world relative to the camera position
     public static void render(PoseStack stack, Camera camera) {
@@ -68,8 +84,10 @@ public class ScreenRenderer {
         fixRotation(stack, screen.getFacing());
         stack.scale(screen.getWidth(), screen.getHeight(), 0);
 
-        // Render the screen texture or black square
-        if (
+        // Render the screen texture, error image, or black square
+        if (screen.errored) {
+            renderGpuTexture(stack, tessellator, ERROR_RENDER_TYPE);
+        } else if (
                 screen.isVideoStarted() &&
                         screen.texture != null &&
                         screen.renderType != null

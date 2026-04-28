@@ -509,6 +509,18 @@ public class MediaPlayer {
         } catch (Exception e) {
             LoggingManager.error("Failed to initialize MediaPlayer ", e);
             screen.errored = true;
+            String msg = e.getMessage();
+            if (msg != null && (msg.contains("Sign in to confirm") || msg.contains("bot"))) {
+                Minecraft.getInstance().execute(() -> {
+                    if (Minecraft.getInstance().player != null) {
+                        Minecraft.getInstance().player.displayClientMessage(
+                                net.minecraft.network.chat.Component.literal(
+                                        "§cD |§f YouTube requires sign-in. Install yt-dlp and run: §eyt-dlp --cookies-from-browser chrome"
+                                ), false
+                        );
+                    }
+                });
+            }
         }
     }
 
